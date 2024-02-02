@@ -4,6 +4,7 @@ import holberton_logo from './holberton-logo.jpg';
 
 function App() {
   return (
+    <>
       <div className="App-body">
         <p>Login to access the full dashboard</p>
         <label htmlFor="email">Email: </label>
@@ -12,6 +13,7 @@ function App() {
         <input type="password" id="password" />
         <button>OK</button>
       </div>
+    </>
   );
 }
 
