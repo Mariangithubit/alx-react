@@ -51,4 +51,4 @@ module.exports = {
       template: "./dist/index.html",
     }),
   ],
-};
+}
