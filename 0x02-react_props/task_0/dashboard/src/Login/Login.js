@@ -1,20 +1,19 @@
-import './App.css';
-import { getFullYear, getFooterCopy } from './utils';
-import holberton_logo from './holberton-logo.jpg';
+import React from 'react';
+import './Login.css';
 
-function App() {
+const Login = () => {
   return (
     <>
       <p>Login to access the full dashboard</p>
-      <form>  
-        <label htmlFor="email">Email: </label>
-        <input type="email" id="email" />
-        <label htmlFor="password"> Password: </label>
-        <input type="password" id="password" />
+      <form>
+        <label htmlFor="email">Email:</label>
+        <input type="email" name="email"></input>
+        <label htmlFor="password">Password:</label>
+        <input type="password" name="password"></input>
         <button>OK</button>
       </form>
     </>
   );
 }
-
-export default App;
+ 
+export default Login;
