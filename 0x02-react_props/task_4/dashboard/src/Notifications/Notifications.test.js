@@ -1,21 +1,27 @@
-import React from 'react';
-import { shallow } from 'enzyme';
+import React from "react";
+import "./Notifications.css";
+import closeIcon from "../assets/close-icon.png";
+import { getLatestNotification } from "../utils/utils";
+import NotificationItem from "./NotificationItem";
 
-import Notifications from './Notifications';
+function Notifications() {
+  return (
+    <div className="Notifications">
+      <button
+        style={{ color: "#3a3a3a", fontWeight: "bold", background: "none", border: "none", fontSize: "10px", position: "absolute", right: "2px", top: "2px", cursor: "pointer" }}
+        aria-label="Close"
+        onClick={console.log("Close button has been clicked")}
+      >
+        <img src={closeIcon} alt="closeIcon" width="10px" />
+      </button>
+      <p>Here is the list of notifications</p>
+      <ul>
+        <NotificationItem type="default" value="New course available" />
+        <NotificationItem type="urgent" value="New resume available" />
+        <NotificationItem type="urgent" html={getLatestNotification()} />
+      </ul>
+    </div>
+  );
+}
 
-describe('<Notifications />', () => {
-  it('renders without crashing', () => {
-    shallow(<Notifications />);
-  });
-
-  it('renders three list items', () => {
-    const wrapper = shallow(<Notifications />);
-    expect(wrapper.find('li')).toHaveLength(3);
-  });
-
-  it('renders the text in the notifications', () => {
-    const text = 'Here is the list of notifications';
-    const wrapper = shallow(<Notifications />);
-    expect(wrapper.find('p').text()).toBe(text);
-  });
-});
+export default Notifications;
