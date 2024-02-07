@@ -1,6 +1,9 @@
 import React from "react";
 import CourseListRow from "./CourseListRow";
-import { shallow } from "enzyme";
+import { shallow, configure } from "enzyme";
+import Adapter from "enzyme-adapter-react-16";
+
+configure({ adapter: new Adapter() });
 
 describe("Course List Row component test", () => {
   it("should render without crashing", () => {
