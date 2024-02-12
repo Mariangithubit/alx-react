@@ -3,18 +3,15 @@ import PropTypes from "prop-types";
 import { StyleSheet, css } from "aphrodite";
 
 function CourseListRow({ isHeader, textFirstCell, textSecondCell }) {
-  const className = css(
-    isHeader ? styles.headerRow : styles.row
-  )
   return (
-    <tr className={className}>
+    <tr className={isHeader ? css(styles.header) : css(styles.normal)}>
       {isHeader ? (
         textSecondCell === null ? (
-          <th colSpan={2} className={className}>{textFirstCell}</th>
+          <th colSpan={2}>{textFirstCell}</th>
         ) : (
           <>
-            <th className={className}>{textFirstCell}</th>
-            <th className={className}>{textSecondCell}</th>
+            <th>{textFirstCell}</th>
+            <th style={headerStyle}>{textSecondCell}</th>
           </>
         )
       ) : (
@@ -28,13 +25,14 @@ function CourseListRow({ isHeader, textFirstCell, textSecondCell }) {
 }
 
 const styles = StyleSheet.create({
-  row: {
-    backgroundColor: '#f5f5f5ab'
+  header: {
+    backgroundColor: "#deb5b545",
   },
-  headerRow: {
-    backgroundColor: '#deb5b545'
-  }
-})
+
+  normal: {
+    backgroundColor: "#f5f5f5ab",
+  },
+});
 
 CourseListRow.propTypes = {
   isHeader: PropTypes.bool,
