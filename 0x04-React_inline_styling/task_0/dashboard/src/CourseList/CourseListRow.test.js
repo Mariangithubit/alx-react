@@ -1,9 +1,6 @@
 import React from "react";
 import CourseListRow from "./CourseListRow";
-import { shallow, configure } from "enzyme";
-import Adapter from "enzyme-adapter-react-16";
-
-configure({ adapter: new Adapter() });
+import { shallow } from "enzyme";
 
 describe("Course List Row component test", () => {
   it("should render without crashing", () => {
@@ -16,7 +13,7 @@ describe("Course List Row component test", () => {
     const wrapper = shallow(<CourseListRow isHeader={true} textFirstCell="test" textSecondCell={null} />);
 
     expect(wrapper.find("tr").children()).toHaveLength(1);
-    expect(wrapper.find("tr").childAt(0).html()).toEqual('<th colSpan="2">test</th>');
+    expect(wrapper.find("tr").childAt(0).html()).toEqual('<th colSpan={2} className={className}>test</th>');
   });
 
   it("should render two cells when textSecondCell not null", () => {
