@@ -1,38 +1,35 @@
 import { fetchCourseSuccess, selectCourse, unSelectCourse } from "../actions/courseActionCreators"
+import { coursesNormalizer } from "../schema/courses"
 import { courseReducer } from "./courseReducer"
+import { Map, fromJS } from "immutable"
 
 
-const courseData = fetchCourseSuccess()
-const state = courseData.data
-state.map((course)=> course.isSelected=false)
+const action = fetchCourseSuccess()
+const courseData = coursesNormalizer(action.data)
+const state = courseData.entities.courses
+courseData.result.map((id)=> state[id].isSelected = false)
 
 describe("courseReducer", ()=>{
   it("the default state returns an empty array", () =>{
     const currentState = courseReducer(undefined, {})
-    expect(currentState).toEqual([])
+    expect(currentState).toEqual(Map([]))
   })
 
   it("FETCH_COURSE_SUCCESS action returns the data passed", () =>{
     const currentState = courseReducer(undefined, fetchCourseSuccess())
-    expect(currentState).toEqual(state)
+    expect(currentState.toJS()).toEqual(state)
   })
 
   it("SELECT_COURSE action returns the data with the right item updated", () =>{
     const index = 2
-    const currentState = courseReducer(state, selectCourse(index))
-    state.map((course)=>{
-      if (course.id === index) course.isSelected = true
-    })
-    expect(currentState).toEqual(state)
+    const currentState = courseReducer(fromJS(state), selectCourse(index))
+    expect(currentState[index].isSelected).toEqual(true)
   })
 
   it("UNSELECT_COURSE action returns the data with the right item updated", () =>{
     const index = 2
-    state[1].isSelected = true
-    const currentState = courseReducer(state, unSelectCourse(index))
-    state.map((course)=>{
-      if (course.id === index) course.isSelected = false
-    })
-    expect(currentState).toEqual(state)
+    state[index].isSelected = true
+    const currentState = courseReducer(fromJS(state), unSelectCourse(index))
+    expect(currentState[index].isSelected).toEqual(false)
   })
 })
