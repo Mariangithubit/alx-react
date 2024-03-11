@@ -1,16 +1,13 @@
 import { initialState, uiReducer } from './uiReducers';
 import { SELECT_COURSE } from "../actions/courseActionTypes";
-import { LOGOUT, DISPLAY_NOTIFICATION_DRAWER, LOGIN_SUCCESS, LOGIN_FAILURE } from '../actions/uiActionTypes'
+import { LOGOUT, DISPLAY_NOTIFICATION_DRAWER, LOGIN, LOGIN_FAILURE } from '../actions/uiActionTypes'
 import { fromJS } from "immutable";
 
-// You can use the toJS function within your tests for an easy comparison
-// Remember that Immutable.js always return a new Map after a modification
-
-const state = fromJS({
+const initState = {
   isNotificationDrawerVisible: false,
   isUserLoggedIn: true,
   user: {}
-})
+}
 
 describe("test uiReducer function", () => {
   it("(uiReducer function) returns state equals the initial state when no action is passed", ()=>{
@@ -30,14 +27,24 @@ describe("test uiReducer function", () => {
   })
 
   it(`returns state changes isUserLoggedIn property correctly when action LOGIN_FAILURE is passed`, ()=>{
-    const currentState = uiReducer(state, { type: LOGIN_FAILURE })
+    const currentState = uiReducer(fromJS(initState), { type: LOGIN_FAILURE })
     const expectedState = { isNotificationDrawerVisible: false, isUserLoggedIn: false, user: {} }
     expect(currentState.toJS()).toEqual(expectedState)
   })
 
   it(`returns state changes isUserLoggedIn property correctly when action LOGOUT is passed`, () => {
-    const currentState = uiReducer(state, { type: LOGOUT })
-    const expectedState = { isNotificationDrawerVisible: false, isUserLoggedIn: false, user: {} }
+    const currentState = uiReducer(fromJS(initState), { type: LOGOUT })
+    const expectedState = { isNotificationDrawerVisible: false, isUserLoggedIn: false, user: null }
     expect(currentState.toJS()).toEqual(expectedState)
   })
+
+  it(`returns state changes user object property correctly when action LOGIN is passed`, () => {
+    const email = "jack@test.com"
+    const password = "strongpwd"
+    const currentState = uiReducer(fromJS(initState), { type: LOGIN, user: {email, password} })
+    const expectedState = { isNotificationDrawerVisible: false, isUserLoggedIn: true, user: {email, password} }
+    expect(currentState.toJS()).toEqual(expectedState)
+  })
+  
+  
 })
