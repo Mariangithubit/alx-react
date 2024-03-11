@@ -1,92 +1,45 @@
-import React from 'react';
-import {Notifications} from "./Notifications";
-import { shallow } from 'enzyme';
-import { StyleSheetTestUtils } from 'aphrodite';
+import { fetchNotifications, markAsRead, setLoadingState, setNotificationFilter, setNotifications } from './notificationActionCreators';
+import { MARK_AS_READ, SET_TYPE_FILTER, NotificationTypeFilters, SET_LOADING_STATE, FETCH_NOTIFICATIONS_SUCCESS } from './notificationActionTypes'
+import thunk from "redux-thunk";
+import configureStore from "redux-mock-store";
+import fetchMock from "fetch-mock-jest"
 
-beforeEach(() => {
-  StyleSheetTestUtils.suppressStyleInjection();
-});
+const mockStore = configureStore([thunk])
 
 afterEach(() => {
-  StyleSheetTestUtils.clearBufferAndResumeStyleInjection()
-  jest.restoreAllMocks();
+  fetchMock.restore();
 });
 
-const messages = {
-  "89":{
-    guid: "89",
-    isRead: true,
-    type: "urgent",
-    value: "Odio pellentesque"
-  }
-}
-
-const notifLength = Object.values(messages).length
-const wrapper = shallow(<Notifications displayDrawer={true} messages={messages}/>);
-describe(`Notifications Component when displayDrawer prop is true
-and messages prop is not empty`, () => {
-  it("renders without crashing", () => {
-    expect(wrapper.exists()).toBe(true)
-  })
-
-  it("renders Notifications div", () => {
-    expect(wrapper.find('.Notifications_95aj9m').exists()).toEqual(true)
-  })
-
-  it("renders list items", () => {
-    expect(wrapper.find('ul').children().length).toEqual(notifLength);
-  })
-
-  it("renders the text: 'Here is the list of notifications:'", () => {
-    expect(wrapper.containsMatchingElement(<p>Here is the list of notifications:</p>)).toEqual(true);
-  })
-
-  it("renders first NotificationItem element with the right html", () => {
-    const firstChild = wrapper.find('ul').children().first();
-    // console.log(firstChild.html())
-    expect(firstChild.html()).toBe('<li class="urgent_1uqgzdq-o_O-listItem_1fp99j6" data-notification-type="urgent">\
-Odio pellentesque</li>');
-  })
-
+test('markAsRead()', ()=>{
+  const action = markAsRead(1)
+  expect(action).toEqual({ type: MARK_AS_READ, index: 1 })
 })
 
-const wrapper2 = shallow(<Notifications displayDrawer={true}/>);
-describe(`Notifications Component when displayDrawer prop is true
-and messages prop is empty (or not used)`, () => {
-  it("renders without crashing", () => {
-    expect(wrapper2.exists()).toBe(true)
-  })
-
-  it("renders the text: 'No new notification for now'", () => {
-    expect(wrapper2.containsMatchingElement(<p>No new notification for now</p>)).toEqual(true);
-  })
-
+test('setNotificationFilter()', ()=>{
+  const action = setNotificationFilter(NotificationTypeFilters.DEFAULT)
+  expect(action).toEqual({ type: SET_TYPE_FILTER, filter:"DEFAULT" })
 })
 
+test("setLoadingState(true) returns right action object", () => {
+  const action = setLoadingState(true)
+  expect(action).toEqual({ type: SET_LOADING_STATE, loading: true})
+})
 
-describe('Notifications Component when displayDrawer prop is false', () => {
-  it("calls handleDisplayDrawer() when meunItem is clicked", () => {
-    const showDrawer = jest.fn()
-    const comp = shallow(<Notifications showDrawer={showDrawer} displayDrawer={false}/>);
-    const menuItem = comp.find('.menuItem_1ron99v')
-    menuItem.simulate('click')
-    expect(showDrawer).toHaveBeenCalled()
-  })
+test("setNotifications()", () => {
+  const action = setNotifications(undefined)
+  expect(action).toEqual({ type: FETCH_NOTIFICATIONS_SUCCESS, data: []})
+})
 
-  it("calls handleHideDrawer() when close-btn is clicked", () => {
-    const hideDrawer = jest.fn()
-    const comp = shallow(<Notifications hideDrawer={hideDrawer} displayDrawer={true}/>);
-    const menuItem = comp.find({id: "close-btn"})
-    menuItem.simulate('click')
-    expect(hideDrawer).toHaveBeenCalled()
-  })
-
-  const component = shallow(<Notifications displayDrawer={false}/>);
-  it("renders div with menuItem class", () => {
-    expect(component.find('.menuItem_1ron99v').exists()).toEqual(true)
-  })
-
-  it("does not render Notifications div", () => {
-    expect(component.find('.Notifications').exists()).toEqual(false)
+test("fetchNotifications()", () =>{
+  const store = mockStore({})
+  const expectedActions = [
+    { type: 'SET_LOADING_STATE', loading: true },
+    { type: 'FETCH_NOTIFICATIONS_SUCCESS', data: [] },
+    { type: 'SET_LOADING_STATE', loading: false }
+  ]
+  fetchMock.get("/notifications.json", [])
+  return store.dispatch(fetchNotifications()).then(()=>{
+    const actions = store.getActions()
+    expect(actions).toEqual(expectedActions)
   })
 })
