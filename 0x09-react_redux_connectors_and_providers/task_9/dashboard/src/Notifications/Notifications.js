@@ -3,9 +3,6 @@ import { StyleSheet, css } from 'aphrodite';
 import closebtn from '../assets/close-btn.png';
 import NotificationItem from './NotificationItem';
 import PropTypes from 'prop-types';
-import { fetchNotifications, markAsRead, setNotificationFilter } from '../actions/notificationActionCreators';
-import { connect } from "react-redux"
-import { getUnreadNotificationsByType } from '../selectors/notificationSelector';
 
 
 const bounceKeyFrames = {
@@ -98,32 +95,18 @@ const notifType = (color) => {
 const urgent = notifType("red")
 const dfault = notifType("darkblue")
 
-export class Notifications extends React.PureComponent {
-  static propTypes = {
-    messages: PropTypes.arrayOf(PropTypes.object),
-  }
-
-  static defaultProps = {
-      messages: [],
-      fetchNotifications: () => {}
-  }
-
-  componentDidMount() {
-    this.props.fetchNotifications()
-  }
-
-  render() {
+export function Notifications(props) {
     const filterbtns = () => {
       return (
         <p>
-          <span id="default" onClick={() => this.props.setNotificationFilter("DEFAULT")} style={dfault}>default</span> &nbsp;
-          <span id="urgent" onClick={() => this.props.setNotificationFilter("URGENT")} style={urgent}>urgent!</span>
+          <span id="default" onClick={() => props.setNotificationFilter("DEFAULT")} style={dfault}>default</span> &nbsp;
+          <span id="urgent" onClick={() => props.setNotificationFilter("URGENT")} style={urgent}>urgent!</span>
         </p>
       )
     }
     const loadNotifs = () => {
       let rows = <></>
-      const notifArray = this.props.messages
+      const notifArray = props.messages
       if (notifArray.length == 0){
           return (
             <>
@@ -134,7 +117,7 @@ export class Notifications extends React.PureComponent {
       } else {
           rows = notifArray.map((notif, key) => {
             return (<NotificationItem key={key} id={notif.guid} type={notif.type}
-            value={notif.value} markNotificationAsRead={this.props.markNotificationAsRead}/>)
+            value={notif.value} markNotificationAsRead={props.markNotificationAsRead}/>)
           })
       }
       return (
@@ -148,14 +131,14 @@ export class Notifications extends React.PureComponent {
       )
     }
     const showNotifs = () => {
-      if (this.props.displayDrawer) {
+      if (props.displayDrawer) {
         return (
           <>
             <div className={css(styles.Notifications)}>
               <button style={{float:'right', background: 'none', border: 'none'}}
               id="close-btn"
               aria-label="Close"
-              onClick={this.props.hideDrawer}>
+              onClick={props.hideDrawer}>
                 <img src={closebtn} alt="close-btn"/>
               </button>
               {loadNotifs()}
@@ -166,23 +149,26 @@ export class Notifications extends React.PureComponent {
     }
     return (
     <>
-      <div onClick={this.props.showDrawer} className={css(this.props.displayDrawer ? styles.hideMenuItem : styles.menuItem)}>Your notifications</div>
+      <div onClick={props.showDrawer} className={css(props.displayDrawer ? styles.hideMenuItem : styles.menuItem)}>Your notifications</div>
       {showNotifs()}
     </>
     )
-  }
 }
 
-const mapStateToProps = (state) => {
-  return { messages: getUnreadNotificationsByType(state).toJS() }
+Notifications.propTypes = {
+    messages: PropTypes.arrayOf(PropTypes.object),
+    setNotificationFilter: PropTypes.func,
+    displayDrawer: PropTypes.bool,
+    showDrawer: PropTypes.func,
+    hideDrawer: PropTypes.func,
+    markNotificationAsRead: PropTypes.func
 }
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    fetchNotifications: () => dispatch(fetchNotifications()),
-    markNotificationAsRead: (index) => dispatch(markAsRead(index)),
-    setNotificationFilter: (filter) => dispatch(setNotificationFilter(filter))
-  }
+Notifications.defaultProps = {
+    messages: [],
+    displayDrawer: false,
+    showDrawer: () => {},
+    hideDrawer: () => {},
+    setNotificationFilter: () => {},
+    markNotificationAsRead: () => {}
 }
-
-export default connect(mapStateToProps, mapDispatchToProps)(Notifications)
