@@ -1,13 +1,15 @@
-export const filterTypeSelected = (state) => {
-    return state.get("filter");
-  };
-  export const getNotifications = (state) => {
-    return state.get("notifications");
-  };
-  export const getUnreadNotifications = (state) => {
-    const notifications = state.get("notifications");
-    const filtered = notifications.filter(
-      (value, key) => value.get("isRead") === true
-    );
-    return filtered;
-};
+import { createSelector } from "reselect"
+
+
+export const filterTypeSelected = (state) => state.notifications.get("filter")
+export const getNotifications = (state) => state.notifications.get("notifications")
+
+export const getUnreadNotificationsByType = createSelector([filterTypeSelected, getNotifications], (filter, notifications) => {
+  let notifs = [] 
+  if (filter == "DEFAULT") {
+    notifs = notifications.valueSeq().filter(v => !v.isRead)
+   } else if (filter == "URGENT") {
+    notifs = notifications.valueSeq().filter(v => !v.isRead && v.type == "urgent")
+   }
+   return notifs
+})
