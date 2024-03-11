@@ -7,7 +7,13 @@ import { uiReducer } from './reducers/uiReducers';
 import thunk from 'redux-thunk';
 
 
-export const store = createStore(uiReducer, applyMiddleware(thunk))
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+export const store = createStore(
+  uiReducer,
+  composeEnhancers(applyMiddleware(thunk))
+)
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
