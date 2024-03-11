@@ -1,49 +1,84 @@
-import React, { useContext } from "react";
-import logo from "../assets/holberton-logo.jpg";
-import { StyleSheet, css } from "aphrodite";
-import { AppContext } from "../App/AppContext";
+import React, {useContext} from 'react';
+import { StyleSheet, css } from 'aphrodite';
+import logo from '../assets/hbnblogo.jpg';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { logout } from '../actions/uiActionCreators';
 
-function Header() {
-  const { user, logOut } = useContext(AppContext);
-
-  return (
-    <>
-      <div className={css(styles["App-header"])}>
-        <img src={logo} className={css(styles.img)} alt="logo" />
-        <h1>School dashboard</h1>
-      </div>
-
-      {user.isLoggedIn && (
-        <section className={css(styles.greeting)} id="logoutSection">
-          Welcome<strong> {user.email} </strong>
-          <em>
-            <a href="#" onClick={logOut}>
-              (logout)
-            </a>
-          </em>
-        </section>
-      )}
-    </>
-  );
-}
 
 const styles = StyleSheet.create({
-  "App-header": {
-    fontSize: "1.4rem",
-    color: "#e0354b",
+  header: {
     display: "flex",
     alignItems: "center",
-    borderBottom: "3px solid #e0354b",
+    borderBottom: "4px solid #E0354B",
+    marginBottom: 60
   },
-
+  
   img: {
-    width: "200px",
-    height: "200px",
+    width: 160,
+    height: 160
+  },
+  
+  heading: {
+    color: "#E0354B"
   },
 
-  greeting: {
-    marginTop: "1rem",
-  },
-});
+  logOut: {
+    fontStyle: "italic",
+    textDecoration: "underline",
+    cursor: "pointer"
+  }
 
-export default Header;
+})
+
+export class Header extends React.Component {
+  render() {
+    const {user} = this.props
+    const displayText = () => {
+      if (this.props.isLoggedIn){
+        return (
+        <section id="logoutSection">Welcome {user.email} 
+          <a  className={css(styles.logOut)} onClick={this.props.logOut}> (logout)</a>
+        </section>
+        )
+      }
+    }
+    return (
+      <>
+      <div className={css(styles.header)}>
+        <img className={css(styles.img)} src={logo} alt="logo"/>
+        <h1 className={css(styles.heading)}>School dashboard</h1>
+      </div>
+      {displayText()}
+      </>
+    )
+  }
+}
+
+const mapStateToProps = (state) => {
+  const user = state.get("user")
+  const isLoggedIn = state.get("isUserLoggedIn")
+  return { user, isLoggedIn }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {logOut: () => dispatch(logout())}
+}
+
+Header.propTypes = {
+  user: PropTypes.shape({
+    email: PropTypes.string,
+    password: PropTypes.string,
+  }),
+  isLoggedIn: PropTypes.bool
+}
+
+Header.defaultProps = {
+    user: {
+      email: "",
+      password: ""
+    },
+    isLoggedIn: false
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header)
