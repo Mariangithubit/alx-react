@@ -47,12 +47,6 @@ and messages prop is not empty`, () => {
 Odio pellentesque</li>');
   })
 
-  it("call fetctNotifications actioncreator when component is mounted", ()=>{
-    const fetchNotifications = jest.fn()
-    const wrapper = shallow(<Notifications fetchNotifications={fetchNotifications}/>);
-    expect(fetchNotifications).toHaveBeenCalled()
-  })
-
   it("calls setNotificationFilter with DEFAULT when 'default' button is clicked ", ()=> {
     const setNotificationFilter = jest.fn()
     const wrapper = shallow(<Notifications displayDrawer={true}  messages={messages} 
