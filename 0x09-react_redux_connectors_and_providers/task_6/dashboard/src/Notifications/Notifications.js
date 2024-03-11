@@ -3,8 +3,10 @@ import { StyleSheet, css } from 'aphrodite';
 import closebtn from '../assets/close-btn.png';
 import NotificationItem from './NotificationItem';
 import PropTypes from 'prop-types';
-import { fetchNotifications } from '../actions/notificationActionCreators';
+import { fetchNotifications, markAsRead } from '../actions/notificationActionCreators';
 import { connect } from "react-redux"
+import { Map } from "immutable";
+import { getUnreadNotifications } from '../selectors/notificationSelector';
 
 
 const bounceKeyFrames = {
@@ -86,11 +88,11 @@ const styles = StyleSheet.create({
 
 export class Notifications extends React.PureComponent {
   static propTypes = {
-    messages: PropTypes.object,
+    messages: PropTypes.arrayOf(PropTypes.object),
   }
 
   static defaultProps = {
-      messages: {},
+      messages: [],
       fetchNotifications: () => {}
   }
 
@@ -101,7 +103,7 @@ export class Notifications extends React.PureComponent {
   render() {
     const loadNotifs = () => {
       let rows = <></>
-      const notifArray = Object.values(this.props.messages)
+      const notifArray = this.props.messages
       // console.log(notifArray)
       if (notifArray.length == 0){
           return <p>No new notification for now</p>
@@ -146,13 +148,14 @@ export class Notifications extends React.PureComponent {
   }
 }
 
-const mapPropstoState = (state) =>{
-  return { messages: state.notifications.get("notifications") }
+const mapPropstoState = (state) => {
+  return { messages: getUnreadNotifications(state) }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    fetchNotifications: () => dispatch(fetchNotifications())
+    fetchNotifications: () => dispatch(fetchNotifications()),
+    markNotificationAsRead: (index) => dispatch(markAsRead(index))
   }
 }
 
