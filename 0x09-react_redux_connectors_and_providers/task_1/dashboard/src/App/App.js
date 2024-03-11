@@ -10,6 +10,7 @@ import BodySectionWithMarginBottom from '../BodySection/BodySectionWithMarginBot
 import BodySection from '../BodySection/BodySection';
 import {AppContext, defaultUser } from './AppContext'
 import { connect } from 'react-redux';
+import { displayNotificationDrawer, hideNotificationDrawer } from '../actions/uiActionCreators';
 
 
 const styles = StyleSheet.create({
@@ -22,11 +23,10 @@ const styles = StyleSheet.create({
 })
 
 
-export default class App extends React.Component {
+export class App extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      displayDrawer: false,
       user: defaultUser,
       listCourses: [
         {id: 1, name: 'ES6', credit: 60},
@@ -41,6 +41,20 @@ export default class App extends React.Component {
     }
   }
 
+  static propTypes = {
+    isLoggedIn: PropTypes.bool,
+    displayDrawer: PropTypes.bool,
+    displayNotificationDrawer: PropTypes.func,
+    hideNotificationDrawer: PropTypes.func
+  }
+
+  static defaultProps = {
+      isLoggedIn: false,
+      displayDrawer: false,
+      displayNotificationDrawer: () => {},
+      hideNotificationDrawer: () => {}
+  }
+
   logOut = () => {
     this.setState({user: defaultUser})
   }
@@ -48,14 +62,6 @@ export default class App extends React.Component {
   logIn = (email, password) => {
     const currentUser = {email:email, password:password, isLoggedIn: true}
     this.setState({user: currentUser })
-  }
-
-  handleDisplayDrawer = () => {
-    this.setState({displayDrawer: true})
-  }
-
-  handleHideDrawer = () => {
-    this.setState({displayDrawer: false})
   }
 
   markNotificationAsRead = (id) => {
@@ -85,8 +91,8 @@ export default class App extends React.Component {
     const currentUser = this.state.user
     const logOut = this.logOut
     const displayDrawerState = this.state.displayDrawer;
-    const showDrawer = this.handleDisplayDrawer;
-    const hideDrawer = this.handleHideDrawer;
+    const showDrawer = this.props.displayNotificationDrawer;
+    const hideDrawer = this.props.hideNotificationDrawer;
     const LoginStatus = () => {
       if (currentUser.isLoggedIn) {
         return (
@@ -105,7 +111,7 @@ export default class App extends React.Component {
   }
   return (
     <AppContext.Provider value={{currentUser, logOut}}>
-      <Notifications displayDrawer={displayDrawerState} showDrawer={showDrawer} hideDrawer={hideDrawer}
+      <Notifications displayDrawer={this.props.displayDrawer} showDrawer={showDrawer} hideDrawer={hideDrawer}
       listNotifications={this.state.listNotifications} markNotificationAsRead={this.markNotificationAsRead}/>
       <Header/>
       <div className={css(styles.AppBody)}>
@@ -130,7 +136,17 @@ export default class App extends React.Component {
 }
 
 export const mapStateToProps = (state) => {
-  return { isLoggedIn: state.get("isUserLoggedIn") }
+  return { 
+    isLoggedIn: state.get("isUserLoggedIn"),
+    displayDrawer: state.get("isNotificationDrawerVisible") 
+  }
 }
 
-connect(mapStateToProps)(App)
+export const mapDispatchToProps = (dispatch) => {
+  return {
+    displayNotificationDrawer: () => dispatch(displayNotificationDrawer()),
+    hideNotificationDrawer: () => dispatch(hideNotificationDrawer())
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(App)
+// export default App
