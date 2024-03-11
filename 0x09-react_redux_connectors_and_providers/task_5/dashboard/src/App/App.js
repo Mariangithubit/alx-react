@@ -32,11 +32,6 @@ export class App extends React.Component {
         {id: 1, name: 'ES6', credit: 60},
         {id: 2, name: 'Webpack', credit: 20},
         {id: 3, name: 'React', credit: 40}
-      ],
-      listNotifications: [
-        {id: 1, type:"default", value: "New course available", html:{__html:null}},
-        {id: 2, type:"urgent", html:{__html:"Object Oriented Programming intro"}},
-        {id: 3, type:"default", value: "Present Javascript project requirements test on Friday"}
       ]
     }
   }
@@ -55,11 +50,6 @@ export class App extends React.Component {
       displayNotificationDrawer: () => {},
       hideNotificationDrawer: () => {},
       login: () => {}
-  }
-
-  markNotificationAsRead = (id) => {
-    const Notifications = this.state.listNotifications
-    this.setState({listNotifications: Notifications.filter((notif)=> id != notif.id )})
   }
 
   componentDidMount() {
@@ -82,7 +72,6 @@ export class App extends React.Component {
   render () {
     const currentUser = this.state.user
     const logOut = this.logOut
-    const displayDrawerState = this.state.displayDrawer;
     const showDrawer = this.props.displayNotificationDrawer;
     const hideDrawer = this.props.hideNotificationDrawer;
     const LoginStatus = () => {
@@ -103,8 +92,7 @@ export class App extends React.Component {
   }
   return (
     <AppContext.Provider value={{currentUser, logOut}}>
-      <Notifications displayDrawer={this.props.displayDrawer} showDrawer={showDrawer} hideDrawer={hideDrawer}
-      listNotifications={this.state.listNotifications} markNotificationAsRead={this.markNotificationAsRead}/>
+      <Notifications displayDrawer={this.props.displayDrawer} showDrawer={showDrawer} hideDrawer={hideDrawer}/>
       <Header/>
       <div className={css(styles.AppBody)}>
         {LoginStatus()}
@@ -129,8 +117,8 @@ export class App extends React.Component {
 
 export const mapStateToProps = (state) => {
   return { 
-    isLoggedIn: state.get("isUserLoggedIn"),
-    displayDrawer: state.get("isNotificationDrawerVisible") 
+    isLoggedIn: state.ui.get("isUserLoggedIn"),
+    displayDrawer: state.ui.get("isNotificationDrawerVisible") 
   }
 }
 
